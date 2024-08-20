@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список сообщений</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'messenges/home.css' %}">
+    <script src="{% static 'js/pagination.js' %}" defer></script>
+    <script src="{% static 'js/progress_bar.js' %}" defer></script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>Список сообщений</h1>
+
+        <!-- Прогресс-бар -->
+        <div class="progress-bar-container">
+            <div id="progress-bar"></div>
+        </div>
+
+        <!-- Таблица с сообщениями -->
+        <table id="messages-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Отправитель</th>
+                    <th>Дата</th>
+                    <th>Тема</th>
+                    <th>Описание</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in page_obj %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ message.1 }}</td>
+                        <td>{{ message.2|date:"d-M-Y H:i:s" }}</td>
+                        <td>{{ message.0 }}</td>
+                        <td>{{ message.3 }}</td> <!-- Описание -->
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">Нет сообщений</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Навигация по страницам -->
+        <div class="pagination">
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1">&laquo; Первая</a>
+                    <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+</html>
