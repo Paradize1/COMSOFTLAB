@@ -17,19 +17,33 @@ h1 {
     text-align: center;
 }
 
+/* Стили для контейнера прогресс-бара */
 .progress-bar-container {
     width: 100%;
     background-color: #e0e0e0;
-    border-radius: 25px;
+    border-radius: 25px; /* Скругление углов контейнера */
     overflow: hidden;
     margin-bottom: 20px;
 }
 
+/* Стили для самого прогресс-бара */
 #progress-bar {
-    width: 0%;
-    height: 20px;
-    background-color: #76c7c0;
-    transition: width 0.5s;
+    height: 20px; /* Высота прогресс-бара */
+    width: 0%; /* Начальная ширина прогресс-бара */
+    background-color: #76c7c0; /* Цвет прогресс-бара */
+    transition: width 0.5s ease; /* Плавное изменение ширины */
+}
+
+/* Стили для сообщения загрузки */
+#loading-indicator {
+    text-align: center;
+    font-weight: bold;
+    margin: 20px 0;
+    font-size: 18px;
+    border: 2px solid black; /* Черная рамка вокруг сообщения */
+    padding: 10px;
+    background-color: #f3f3f3; /* Цвет фона сообщения */
+    border-radius: 5px; /* Скругление углов сообщения */
 }
 
 table {
@@ -51,59 +65,8 @@ tbody tr:nth-child(even) {
 }
 
 
-.pagination {
-    margin: 20px 0;
-    text-align: center;
-}
 
-.pagination .step-links a {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    margin: 0 4px;
-    text-decoration: none;
-    color: #007bff;
-}
 
-.pagination .step-links a:hover {
-    background-color: #f1f1f1;
-}
 
-.pagination .current {
-    padding: 8px 16px;
-    border: 1px solid #ddd;
-    margin: 0 4px;
-    background-color: #007bff;
-    color: white;
-}
 
-.progress-bar-container {
-    width: 100%;
-    background-color: #f3f3f3;
-    border: 1px solid #ddd;
-    margin: 20px 0;
-    position: relative;
-    height: 30px;
-}
 
-/* Полоса прогресса */
-#progress-bar {
-    height: 100%;
-    background-color: #4caf50;
-    color: white;
-    text-align: center;
-    line-height: 30px; /* Выравнивание текста по центру по высоте */
-    width: 0%;
-    transition: width 0.4s ease-in-out; /* Плавное изменение ширины */
-}
-
-/* Добавление отступа для текста */
-#progress-bar:before {
-    content: attr(data-text);
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-    text-align: center;
-    color: white;
-}
