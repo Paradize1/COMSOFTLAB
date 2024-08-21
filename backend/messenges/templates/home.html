@@ -12,8 +12,20 @@
     <div class="container">
         <h1>Список сообщений</h1>
 
+        <div class="info-container">
+            <div class="info-box">
+                <h2>Информация</h2>
+                <p>Всего обнаружено сообщений: <span id="total-messages">0</span></p>
+                <p>Сообщений в базе данных: <span id="db-messages">0</span></p>
+                <p>Совпадающие сообщения: <span id="duplicate-messages">0</span></p>
+                <p>Уникальные сообщения: <span id="unique-messages">0</span></p>
+            </div>
+        </div>
+
         <!-- Прогресс-бар -->
         <div class="progress-bar-container">
+            <div id="countdown" style="text-align: center; font-weight: bold; margin: 20px 0; font-size: 18px;"></div>
+
             <div id="progress-bar"></div>
         </div>
 

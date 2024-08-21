@@ -31,3 +31,28 @@
     text-decoration: none;
     cursor: pointer;
 }
+
+
+
+.info-container {
+    margin-bottom: 20px;
+}
+
+.info-box {
+    padding: 10px;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.info-box h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.info-box p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}

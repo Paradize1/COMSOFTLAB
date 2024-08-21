@@ -49,7 +49,6 @@ def fetch_all_messages():
 
         return processed_messages
 
-
     # Объединяем все сообщения в один список
     all_messages = yandex_messages + mailru_messages
 
@@ -64,3 +63,76 @@ def fetch_all_messages():
     print(f"Время загрузки и обработки: {elapsed_time:.2f} секунд")
 
     return all_messages
+
+
+
+
+#------------------------------------------------------------#
+    # Сохраняем сообщения в базе данных
+def save_messages_to_db(messages):
+    saved_count = 0
+
+    # Получаем учетные данные
+    mailru_credentials = get_credentials('mail.ru')
+    yandex_credentials = get_credentials('yandex')
+    print(yandex_credentials)
+    print(mailru_credentials)
+    
+    # Создаем словарь для быстрого доступа к учетным записям
+    email_accounts = {
+        'mail.ru': mailru_credentials['email'] if mailru_credentials else None,
+        'yandex': yandex_credentials['email'] if yandex_credentials else None
+    }
+
+    for subject, sender, date, description in messages:
+        try:
+            # Определяем сервис по отправителю
+            account_service = None
+            for service, email in email_accounts.items():
+                account_service = service
+                break
+
+            if account_service is None:
+                print(f"Не удалось определить сервис для отправителя: {sender}")
+                continue
+
+            # Получаем EmailAccount для найденного сервиса
+            try:
+                account = EmailAccount.objects.get(service=account_service)
+            except EmailAccount.DoesNotExist:
+                print(f"EmailAccount не найден для сервиса: {account_service}")
+                continue
+            
+            # Проверяем, является ли date строкой и преобразуем, если необходимо
+            if isinstance(date, str):
+                received_date = parse_datetime(date)
+                if received_date is None:
+                    print(f"Ошибка: не удалось разобрать дату: {date}")
+                    continue
+            elif isinstance(date, datetime):
+                received_date = date
+            else:
+                print(f"Ошибка: дата не является строкой или datetime: {date}")
+                continue
+            
+            # Проверка на существование сообщения с теми же параметрами
+            if Message.objects.filter(account=account, subject=subject, received_date=received_date).exists():
+                print(f"Сообщение '{subject}' уже существует в базе данных.")
+                continue
+
+            # Создаем и сохраняем объект сообщения
+            Message.objects.create(
+                account=account,
+                subject=subject,
+                received_date=received_date,
+                text=description,
+                sent_date=None  # Если есть информация о sent_date, укажите её здесь
+            )
+            saved_count += 1
+        except Exception as e:
+            print(f"Ошибка при сохранении сообщения: {e}")
+
+    # Выводим информацию о сохраненных сообщениях
+    print(f"Сохранено сообщений в базе данных: {saved_count}")
+    
+    

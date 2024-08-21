@@ -1,5 +1,3 @@
-# shehovtsovandrew@yandex.ru
-# xtmqttcubsxjidxk
 
 import imaplib
 import email as em
@@ -24,14 +22,17 @@ def yandex_fetch(email_address, password):
         mail.select("inbox")
 
         today = datetime.today()
-        last_week = today - timedelta(days=7)
-        last_week_formatted = last_week.strftime("%d-%b-%Y")
+        start_of_month = today.replace(day=1) - timedelta(days=1)  # Предыдущий месяц
+        start_of_month = start_of_month.replace(day=1)  # Начало предыдущего месяца
+        start_of_month_formatted = start_of_month.strftime("%d-%b-%Y")
 
-        status, messages = mail.search(None, f'(SINCE {last_week_formatted})')
+        status, messages = mail.search(None, f'(SINCE {start_of_month_formatted})')
         message_numbers = messages[0].split()
 
+        print(f"Найдено сообщений: {len(message_numbers)}")
+
         if message_numbers:
-            for num in message_numbers[:5]:  # Ограничиваем до 5 сообщений
+            for num in message_numbers[:50]:  # Ограничиваем до 10 сообщений
                 status, msg_data = mail.fetch(num, "(RFC822)")
                 for response_part in msg_data:
                     if isinstance(response_part, tuple):

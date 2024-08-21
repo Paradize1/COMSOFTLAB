@@ -1,13 +1,9 @@
-# kucheryavaiapochta@mail.ru
-# Es4wiGw3ezC2j7zj3pwt
 
 import imaplib
 import email as em
 from email.header import decode_header
-from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
-
-from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 
 def decode_mime_words(s):
     """Декодирует MIME-заголовки с поддержкой различных кодировок."""
@@ -16,30 +12,27 @@ def decode_mime_words(s):
         for word, encoding in decode_header(s)
     )
 
-def clean_html(html):
-    """Очищает HTML и возвращает текст."""
-    soup = BeautifulSoup(html, "html.parser")
-    return soup.get_text()
-
-
 def mailru_fetch(email_address, password):
     all_messages = []
 
     try:
-        # Подключаемся к IMAP серверу Yandex
+        # Подключаемся к IMAP серверу Mail.ru
         mail = imaplib.IMAP4_SSL("imap.mail.ru")
         mail.login(email_address, password)
         mail.select("inbox")
 
         today = datetime.today()
-        last_week = today - timedelta(days=7)
-        last_week_formatted = last_week.strftime("%d-%b-%Y")
+        start_of_month = today.replace(day=1) - timedelta(days=1)  # Предыдущий месяц
+        start_of_month = start_of_month.replace(day=1)  # Начало предыдущего месяца
+        start_of_month_formatted = start_of_month.strftime("%d-%b-%Y")
 
-        status, messages = mail.search(None, f'(SINCE {last_week_formatted})')
+        status, messages = mail.search(None, f'(SINCE {start_of_month_formatted})')
         message_numbers = messages[0].split()
 
+        print(f"Найдено сообщений: {len(message_numbers)}")
+
         if message_numbers:
-            for num in message_numbers[:0]:  # Ограничиваем до 5 сообщений
+            for num in message_numbers[:50]:  # Ограничиваем до 10 сообщений
                 status, msg_data = mail.fetch(num, "(RFC822)")
                 for response_part in msg_data:
                     if isinstance(response_part, tuple):
@@ -55,17 +48,17 @@ def mailru_fetch(email_address, password):
                                 if "attachment" not in content_disposition:
                                     payload = part.get_payload(decode=True)
                                     if content_type == "text/plain":
-                                        body += payload.decode()
+                                        body += payload.decode(errors='ignore')
                                     elif content_type == "text/html":
-                                        body += clean_html(payload.decode())
+                                        body += payload.decode(errors='ignore')
                         else:
                             content_type = msg.get_content_type()
                             if content_type == "text/plain":
-                                body = msg.get_payload(decode=True).decode()
+                                body = msg.get_payload(decode=True).decode(errors='ignore')
                             elif content_type == "text/html":
-                                body = clean_html(msg.get_payload(decode=True).decode())
+                                body = msg.get_payload(decode=True).decode(errors='ignore')
 
-                        all_messages.append((subject, from_, date, body.strip()[:1000]))
+                        all_messages.append((subject, from_, date, body))
 
         mail.logout()
 
