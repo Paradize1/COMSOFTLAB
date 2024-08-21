@@ -1,4 +1,4 @@
-        $(document).ready(function() {
+$(document).ready(function() {
     $('#loading-indicator').show(); // Показываем индикатор загрузки
 
     // Устанавливаем этапы загрузки
@@ -23,6 +23,21 @@
         updateProgressBar(percentage);
     }
 
+
+    // Функция для экранирования HTML
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+}
+
+
+
+
+
     $.ajax({
         url: messageListUrl,  // Убедитесь, что URL соответствует вашему URL-роуту
         method: "GET",
@@ -32,6 +47,7 @@
         },
         success: function(data) {
             var tbody = $('#messages-table tbody');
+            console.log("Данные получены:", data);
 
             // Обновляем прогресс до 33% (Получаем данные)
             setTimeout(function() {
@@ -49,7 +65,7 @@
                             '<td>' + message.sender + '</td>' +
                             '<td>' + message.date + '</td>' +
                             '<td>' + message.subject + '</td>' +
-                            '<td>' + message.description + '</td>' +
+                            '<td><button class="view-description" data-full-text="' + escapeHtml(message.description) + '">Посмотреть описание</button></td>' +
                             '</tr>';
                         tbody.append(row);
                     });
@@ -67,4 +83,25 @@
             $('#loading-indicator').hide(); // Скрываем индикатор даже в случае ошибки
         }
     });
+
+// Обработчик клика по кнопке "Посмотреть описание"
+$('#messages-table').on('click', '.view-description', function() {
+    var fullText = $(this).data('full-text'); // Получаем полное описание из атрибута data-full-text
+    $('#modal-description').html(fullText); // Используем .html() для вставки HTML-кода
+    $('#modal').show(); // Показываем модальное окно
+});
+
+// Обработчик клика по кнопке закрытия модального окна
+$('.close-btn').on('click', function() {
+    $('#modal').hide(); // Скрываем модальное окно
+});
+
+// Закрытие модального окна при клике вне его
+$(window).on('click', function(event) {
+    if ($(event.target).is('#modal')) {
+        $('#modal').hide(); // Скрываем модальное окно, если кликнули вне его
+    }
+});
+
+
 });

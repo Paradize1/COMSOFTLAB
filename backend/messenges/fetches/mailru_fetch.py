@@ -39,7 +39,7 @@ def mailru_fetch(email_address, password):
         message_numbers = messages[0].split()
 
         if message_numbers:
-            for num in message_numbers[:50]:  # Ограничиваем до 5 сообщений
+            for num in message_numbers[:0]:  # Ограничиваем до 5 сообщений
                 status, msg_data = mail.fetch(num, "(RFC822)")
                 for response_part in msg_data:
                     if isinstance(response_part, tuple):

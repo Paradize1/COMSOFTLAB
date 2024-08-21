@@ -1,9 +1,11 @@
-import re
 import time
-
+import re
+from datetime import datetime
 from .fetches.yandex_fetch import yandex_fetch
 from .fetches.mailru_fetch import mailru_fetch
-from .models import EmailAccount
+from .models import EmailAccount, Message
+from django.utils.dateparse import parse_datetime
+import unicodedata
 
 def get_credentials(service_name):
     try:
@@ -36,13 +38,17 @@ def fetch_all_messages():
             # 1. Удаление текста в скобках из отправителя
             cleaned_sender = re.sub(r'\s*<[^>]+>', '', sender).strip()
 
-            # 2. Сокращение больших пробелов в описании до одного пробела
-            cleaned_description = re.sub(r'\s+', ' ', description).strip()
+            # 2. Нормализация и очистка текста описания
+            description = unicodedata.normalize('NFKC', description)  # Приведение текста к стандартной форме
+            cleaned_description = re.sub(r'[\u200c\u200b\u200d\u2060\u00a0]+', ' ', description)  # Удаление специальных символов
+            cleaned_description = re.sub(r'\s+', ' ', cleaned_description)  # Сокращение множественных пробелов до одного пробела
+            cleaned_description = cleaned_description.strip()  # Удаление пробелов в начале и конце
 
             # Добавляем обработанное сообщение в новый список
             processed_messages.append((subject, cleaned_sender, date, cleaned_description))
 
         return processed_messages
+
 
     # Объединяем все сообщения в один список
     all_messages = yandex_messages + mailru_messages

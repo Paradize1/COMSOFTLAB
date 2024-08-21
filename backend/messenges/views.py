@@ -1,11 +1,10 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .utils import fetch_all_messages  # Импортируем основную функцию
-
+from .utils import fetch_all_messages
 
 def message_list(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        all_messages = fetch_all_messages()[:10]  # Берем первые 10 сообщений
+        all_messages = fetch_all_messages()[:10]  # Берём первые 10 сообщений
         data = [
             {
                 'id': idx + 1,

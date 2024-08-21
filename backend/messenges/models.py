@@ -19,7 +19,7 @@ class EmailAccount(models.Model):
 class Message(models.Model):
     account = models.ForeignKey(EmailAccount, on_delete=models.CASCADE, related_name='messages')
     subject = models.CharField(max_length=255)
-    sent_date = models.DateTimeField()
+    sent_date = models.DateTimeField(null=True, blank=True)   
     received_date = models.DateTimeField()
     text = models.TextField()
     files = models.JSONField(default=list, blank=True)
