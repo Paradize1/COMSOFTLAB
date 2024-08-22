@@ -1,18 +1,18 @@
 $(document).ready(function() {
-    $('#loading-indicator').show(); // Показываем индикатор загрузки
+    $('#loading-indicator').show(); 
 
     // Устанавливаем этапы загрузки
     var stages = [
-        "Получаем данные...",
-        "Поиск сообщений...",
+        "Получаем данные с Яндекса...",
+        "Получаем данные с Mail.ru...",
+        "Обрабатываем данные...",
         "Загружаем в таблицу..."
     ];
 
-    var stageDurations = [500, 1000, 500]; // Длительность этапов в миллисекундах
-    var totalDuration = stageDurations.reduce((a, b) => a + b, 0); // Общее время загрузки
-
+    var totalStages = stages.length;
     var currentStage = 0;
     var startTime = new Date().getTime(); // Время начала загрузки
+    var estimatedTotalTime = 3000; // Оценочное общее время загрузки в миллисекундах
 
     function updateProgressBar(percentage) {
         $('#progress-bar').css('width', percentage + '%');
@@ -26,19 +26,10 @@ $(document).ready(function() {
         $('#countdown').text('Осталось: ' + Math.ceil(remainingTime / 1000) + ' сек');
     }
 
-    function progressUpdate(stage, percentage) {
-        updateLoadingMessage(stages[stage]);
-        updateProgressBar(percentage);
-        // Запускаем таймер отсчета только во время загрузки в таблицу
-        if (stage === 2 && !$('#countdown').text()) {
-            startCountdown();
-        }
-    }
-
-    function startCountdown() {
+    function startCountdown(totalTime) {
         var interval = setInterval(function() {
             var elapsedTime = new Date().getTime() - startTime;
-            var remainingTime = totalDuration - elapsedTime;
+            var remainingTime = totalTime - elapsedTime;
 
             if (remainingTime <= 0) {
                 remainingTime = 0;
@@ -48,6 +39,23 @@ $(document).ready(function() {
             updateCountdown(remainingTime);
         }, 1000);
     }
+
+    function progressUpdate(stage, percentage, duration) {
+        updateLoadingMessage(stages[stage]);
+        updateProgressBar(percentage);
+
+        if (stage === totalStages - 1) {
+            startCountdown(duration); // Запускаем таймер отсчета во время загрузки в таблицу
+        }
+    }
+
+    // Инициализируем прогресс
+    progressUpdate(0, 0, estimatedTotalTime);
+
+
+
+    //-----------------------------------------\\
+
 
     // Функция для экранирования HTML
     function escapeHtml(text) {
@@ -69,57 +77,61 @@ $(document).ready(function() {
         method: "GET",
         dataType: "json",
         beforeSend: function() {
-            progressUpdate(0, 0); // Начало загрузки
+            progressUpdate(0, 0, estimatedTotalTime); 
         },
         success: function(data) {
             var tbody = $('#messages-table tbody');
             console.log("Данные получены:", data);
 
-            // Обновляем статистику
-            $('#total-messages').text(data.stats.total);
-            $('#db-messages').text(data.stats.db);
-            $('#duplicate-messages').text(data.stats.duplicates);
-            $('#unique-messages').text(data.stats.unique);
+            // Этап 1: Получение данных с Яндекса
+            setTimeout(function() {
+                progressUpdate(1, 25, estimatedTotalTime);
+            }, 500);
 
-            // Обновляем прогресс до 33% (Поиск сообщений)
-            progressUpdate(1, 33);
+            // Этап 2: Получение данных с Mail.ru
+            setTimeout(function() {
+                progressUpdate(2, 50, estimatedTotalTime);
+            }, 1000);
 
-            // Обновляем таблицу с данными
-            var messages = data.messages;
-            var totalMessages = messages.length;
-            var index = 0;
+            // Этап 3: Обработка данных
+            setTimeout(function() {
+                progressUpdate(3, 75, estimatedTotalTime);
+            }, 1500);
 
-            function addRow() {
-                if (index < totalMessages) {
-                    var message = messages[index];
-                    var row = '<tr>' +
-                        '<td>' + message.id + '</td>' +
-                        '<td>' + message.sender + '</td>' +
-                        '<td>' + message.date + '</td>' +
-                        '<td>' + message.subject + '</td>' +
-                        '<td><button class="view-description" data-full-text="' + escapeHtml(message.description) + '">Посмотреть описание</button></td>' +
-                        '</tr>';
-                    tbody.append(row);
+            // Этап 4: Загрузка данных в таблицу
+            setTimeout(function() {
+                progressUpdate(4, 100, estimatedTotalTime);
+                updateCountdown(0); // Обновляем таймер до 0
+                $('#loading-indicator').hide(); // Скрываем индикатор загрузки
 
-                    index++;
-                    // Переход к следующему сообщению через небольшой интервал
-                    setTimeout(addRow, 100); // Можно изменить интервал для настройки скорости
-                } else {
-                    // Завершаем заполнение таблицы
-                    clearInterval(interval); // Останавливаем таймер
-                    updateCountdown(0); // Обновляем таймер до 0
-                    progressUpdate(2, 100); // Устанавливаем финальную надпись
-                    $('#loading-indicator').hide(); // Скрываем индикатор загрузки
+                // Загрузка данных в таблицу
+                var messages = data.messages;
+                var totalMessages = messages.length;
+                var index = 0;
+
+                function addRow() {
+                    if (index < totalMessages) {
+                        var message = messages[index];
+                        var row = '<tr>' +
+                            '<td>' + message.id + '</td>' +
+                            '<td>' + message.sender + '</td>' +
+                            '<td>' + message.date + '</td>' +
+                            '<td>' + message.subject + '</td>' +
+                            '<td><button class="view-description" data-full-text="' + escapeHtml(message.description) + '">Посмотреть описание</button></td>' +
+                            '</tr>';
+                        tbody.append(row);
+
+                        index++;
+                        setTimeout(addRow, 100); 
+                    } 
                 }
-            }
 
-            // Запуск добавления строк
-            progressUpdate(2, 66); // Начало загрузки в таблицу
-            addRow();
+                addRow();
+            }, 2000);
         },
         error: function() {
             console.error("Ошибка загрузки данных.");
-            $('#loading-indicator').hide(); // Скрываем индикатор даже в случае ошибки
+            $('#loading-indicator').hide(); 
         }
     });
 
@@ -131,20 +143,18 @@ $(document).ready(function() {
 
     // Обработчик клика по кнопке "Посмотреть описание"
     $('#messages-table').on('click', '.view-description', function() {
-        var fullText = $(this).data('full-text'); // Получаем полное описание из атрибута data-full-text
-        $('#modal-description').html(fullText); // Используем .html() для вставки HTML-кода
-        $('#modal').show(); // Показываем модальное окно
+        var fullText = $(this).data('full-text'); 
+        $('#modal-description').html(fullText);
+        $('#modal').show(); 
     });
 
-    // Обработчик клика по кнопке закрытия модального окна
     $('.close-btn').on('click', function() {
-        $('#modal').hide(); // Скрываем модальное окно
+        $('#modal').hide(); 
     });
 
-    // Закрытие модального окна при клике вне его
     $(window).on('click', function(event) {
         if ($(event.target).is('#modal')) {
-            $('#modal').hide(); // Скрываем модальное окно, если кликнули вне его
+            $('#modal').hide(); 
         }
     });
 });

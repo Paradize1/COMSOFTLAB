@@ -29,7 +29,7 @@ def mailru_fetch(email_address, password):
         status, messages = mail.search(None, f'(SINCE {start_of_month_formatted})')
         message_numbers = messages[0].split()
 
-        print(f"Найдено сообщений: {len(message_numbers)}")
+
 
         if message_numbers:
             for num in message_numbers[:50]:  # Ограничиваем до 10 сообщений

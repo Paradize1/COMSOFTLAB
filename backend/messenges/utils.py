@@ -75,8 +75,7 @@ def save_messages_to_db(messages):
     # Получаем учетные данные
     mailru_credentials = get_credentials('mail.ru')
     yandex_credentials = get_credentials('yandex')
-    print(yandex_credentials)
-    print(mailru_credentials)
+    
     
     # Создаем словарь для быстрого доступа к учетным записям
     email_accounts = {
@@ -117,7 +116,6 @@ def save_messages_to_db(messages):
             
             # Проверка на существование сообщения с теми же параметрами
             if Message.objects.filter(account=account, subject=subject, received_date=received_date).exists():
-                print(f"Сообщение '{subject}' уже существует в базе данных.")
                 continue
 
             # Создаем и сохраняем объект сообщения
@@ -126,13 +124,45 @@ def save_messages_to_db(messages):
                 subject=subject,
                 received_date=received_date,
                 text=description,
-                sent_date=None  # Если есть информация о sent_date, укажите её здесь
+                sent_date=None  
             )
             saved_count += 1
         except Exception as e:
             print(f"Ошибка при сохранении сообщения: {e}")
 
-    # Выводим информацию о сохраненных сообщениях
     print(f"Сохранено сообщений в базе данных: {saved_count}")
-    
-    
+
+
+
+
+def calculate_statistics(all_messages, saved_count):
+ 
+    yandex_messages = yandex_fetch(yandex_credentials['email'], yandex_credentials['password'])
+    mailru_messages = mailru_fetch(mailru_credentials['email'], mailru_credentials['password'])
+ 
+ 
+ 
+    total_messages = len(all_messages)
+    db_message_count = Message.objects.count()
+    duplicates = total_messages - saved_count
+    unique_messages = total_messages - duplicates
+    total_yandex = len(yandex_messages) 
+    total_mailru = len(mailru_messages) 
+
+    print('Всего сообщений', total_messages)
+    print('В базе данных',db_message_count)
+    print('Совпадений',duplicates)
+    print('Уникальных',unique_messages)
+    print('Получено с яндекса',total_yandex)
+    print('получено с мейлру',total_mailru)
+
+
+
+    # return {
+    #     'total_messages': total_messages,
+    #     'db_message_count': db_message_count,
+    #     'duplicates': duplicates,
+    #     'unique_messages': unique_messages,
+    #     'total_yandex': total_yandex,
+    #     'total_mailru': total_mailru,
+    # }

@@ -1,13 +1,20 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .utils import fetch_all_messages, save_messages_to_db
+from .utils import fetch_all_messages, save_messages_to_db, calculate_statistics
 from .models import Message
 
 def message_list(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        all_messages = fetch_all_messages()  # Берём первые 10 сообщений
+        all_messages = fetch_all_messages()  # Берём сообщения
 
-        # Рассчитываем статистику до сохранения данных в базе данных
+        # Сохраняем сообщения в базе данных
+        save_messages_to_db(all_messages)
+
+        saved_count = Message.objects.count()
+        
+        # Рассчитываем статистику
+        calculate_statistics(all_messages, saved_count)
+
         total_messages = len(all_messages)
         db_message_count = Message.objects.count()
         duplicates = len(all_messages) - len(set(all_messages))  # Оценка совпадающих
@@ -19,9 +26,6 @@ def message_list(request):
             'duplicates': duplicates,
             'unique': unique,
         }
-
-        # Сохраняем сообщения в базе данных
-        save_messages_to_db(all_messages)
 
         data = [
             {

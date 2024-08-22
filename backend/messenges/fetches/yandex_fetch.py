@@ -6,7 +6,6 @@ from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta
 
 def decode_mime_words(s):
-    """Декодирует MIME-заголовки с поддержкой различных кодировок."""
     return ''.join(
         word.decode(encoding or 'utf-8') if isinstance(word, bytes) else word
         for word, encoding in decode_header(s)
@@ -29,8 +28,8 @@ def yandex_fetch(email_address, password):
         status, messages = mail.search(None, f'(SINCE {start_of_month_formatted})')
         message_numbers = messages[0].split()
 
-        print(f"Найдено сообщений: {len(message_numbers)}")
 
+        
         if message_numbers:
             for num in message_numbers[:50]:  # Ограничиваем до 10 сообщений
                 status, msg_data = mail.fetch(num, "(RFC822)")
