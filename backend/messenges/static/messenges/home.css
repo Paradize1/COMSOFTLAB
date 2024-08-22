@@ -17,33 +17,31 @@ h1 {
     text-align: center;
 }
 
-/* Стили для контейнера прогресс-бара */
 .progress-bar-container {
     width: 100%;
     background-color: #e0e0e0;
-    border-radius: 25px; /* Скругление углов контейнера */
+    border-radius: 25px; 
     overflow: hidden;
     margin-bottom: 20px;
 }
 
-/* Стили для самого прогресс-бара */
 #progress-bar {
-    height: 20px; /* Высота прогресс-бара */
-    width: 0%; /* Начальная ширина прогресс-бара */
-    background-color: #76c7c0; /* Цвет прогресс-бара */
-    transition: width 0.5s ease; /* Плавное изменение ширины */
+    height: 20px; 
+    width: 0%; 
+    background-color: #76c7c0; 
+    transition: width 0.5s ease; 
 }
 
-/* Стили для сообщения загрузки */
+
 #loading-indicator {
     text-align: center;
     font-weight: bold;
     margin: 20px 0;
     font-size: 18px;
-    border: 2px solid black; /* Черная рамка вокруг сообщения */
+    border: 2px solid black; 
     padding: 10px;
-    background-color: #f3f3f3; /* Цвет фона сообщения */
-    border-radius: 5px; /* Скругление углов сообщения */
+    background-color: #f3f3f3; 
+    border-radius: 5px; 
 }
 
 table {

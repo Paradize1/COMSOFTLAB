@@ -1,18 +1,16 @@
 $(document).ready(function() {
     $('#loading-indicator').show(); 
 
-    // Устанавливаем этапы загрузки
     var stages = [
-        "Получаем данные с Яндекса...",
-        "Получаем данные с Mail.ru...",
+
         "Обрабатываем данные...",
         "Загружаем в таблицу..."
     ];
 
     var totalStages = stages.length;
     var currentStage = 0;
-    var startTime = new Date().getTime(); // Время начала загрузки
-    var estimatedTotalTime = 3000; // Оценочное общее время загрузки в миллисекундах
+    var startTime = new Date().getTime(); 
+    var estimatedTotalTime = 3000; 
 
     function updateProgressBar(percentage) {
         $('#progress-bar').css('width', percentage + '%');
@@ -45,11 +43,10 @@ $(document).ready(function() {
         updateProgressBar(percentage);
 
         if (stage === totalStages - 1) {
-            startCountdown(duration); // Запускаем таймер отсчета во время загрузки в таблицу
+            startCountdown(duration);  
         }
     }
 
-    // Инициализируем прогресс
     progressUpdate(0, 0, estimatedTotalTime);
 
 
@@ -83,28 +80,23 @@ $(document).ready(function() {
             var tbody = $('#messages-table tbody');
             console.log("Данные получены:", data);
 
-            // Этап 1: Получение данных с Яндекса
             setTimeout(function() {
                 progressUpdate(1, 25, estimatedTotalTime);
             }, 500);
 
-            // Этап 2: Получение данных с Mail.ru
             setTimeout(function() {
                 progressUpdate(2, 50, estimatedTotalTime);
             }, 1000);
 
-            // Этап 3: Обработка данных
             setTimeout(function() {
                 progressUpdate(3, 75, estimatedTotalTime);
             }, 1500);
 
-            // Этап 4: Загрузка данных в таблицу
             setTimeout(function() {
                 progressUpdate(4, 100, estimatedTotalTime);
-                updateCountdown(0); // Обновляем таймер до 0
-                $('#loading-indicator').hide(); // Скрываем индикатор загрузки
+                updateCountdown(0); 
+                $('#loading-indicator').hide(); 
 
-                // Загрузка данных в таблицу
                 var messages = data.messages;
                 var totalMessages = messages.length;
                 var index = 0;

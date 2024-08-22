@@ -5,7 +5,7 @@ from .models import Message
 
 def message_list(request):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        all_messages = fetch_all_messages()  # Берём сообщения
+        all_messages = fetch_all_messages()  
 
         # Сохраняем сообщения в базе данных
         save_messages_to_db(all_messages)
@@ -17,7 +17,7 @@ def message_list(request):
 
         total_messages = len(all_messages)
         db_message_count = Message.objects.count()
-        duplicates = len(all_messages) - len(set(all_messages))  # Оценка совпадающих
+        duplicates = len(all_messages) - len(set(all_messages)) 
         unique = len(set(all_messages))
 
         stats = {

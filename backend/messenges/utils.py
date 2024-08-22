@@ -35,10 +35,7 @@ def fetch_all_messages():
         for message in messages:
             subject, sender, date, description = message
 
-            # 1. Удаление текста в скобках из отправителя
             cleaned_sender = re.sub(r'\s*<[^>]+>', '', sender).strip()
-
-            # 2. Нормализация и очистка текста описания
             description = unicodedata.normalize('NFKC', description)  # Приведение текста к стандартной форме
             cleaned_description = re.sub(r'[\u200c\u200b\u200d\u2060\u00a0]+', ' ', description)  # Удаление специальных символов
             cleaned_description = re.sub(r'\s+', ' ', cleaned_description)  # Сокращение множественных пробелов до одного пробела
